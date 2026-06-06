@@ -10,6 +10,7 @@ import path from "node:path";
 import { reportVault, infisicalVault } from "./vault.mjs";
 import { infisicalClient } from "./infisical.mjs";
 import { auditLogger } from "./audit.mjs";
+import { knowledgeStore } from "./knowledge.mjs";
 import { requireApproval } from "./biometric.mjs";
 import { createMcpServer } from "./mcp.mjs";
 import { startStdio } from "./jsonrpc.mjs";
@@ -22,7 +23,7 @@ const PROFILES = {
 };
 
 /** Build the MCP tool set against a vault + audit log + approval gate (+ optional Infisical client). */
-export function buildTools({ vault, audit, approver, client }) {
+export function buildTools({ vault, audit, approver, client, knowledge }) {
   return [
     {
       name: "list_services",
@@ -176,6 +177,61 @@ export function buildTools({ vault, audit, approver, client }) {
       inputSchema: { type: "object", properties: { limit: { type: "number" } } },
       handler: async ({ limit }) => ({ entries: await audit.read(limit) }),
     },
+    {
+      name: "get_service_playbook",
+      description:
+        "How to work with a service: dashboard, project refs, rotation/how-to notes, plus its credential names (no values).",
+      inputSchema: { type: "object", properties: { service: { type: "string" } }, required: ["service"] },
+      handler: async ({ service }) => {
+        if (!knowledge) throw new Error("knowledge store not configured");
+        const playbook = knowledge.getService(service) || { service, note: "no playbook yet — add one with set_service_note" };
+        const credentials = (await vault.credentials(service)).map((c) => ({ name: c.name, path: c.path }));
+        return { service, playbook, credentials };
+      },
+    },
+    {
+      name: "set_service_note",
+      description:
+        "Create/update instructions for a service (or per-app). Runbook only — secret VALUES are never stored here.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          service: { type: "string" },
+          app: { type: "string" },
+          dashboardUrl: { type: "string" },
+          projectRef: { type: "string" },
+          note: { type: "string" },
+          howTo: { type: "array", items: { type: "string" } },
+        },
+        required: ["service"],
+      },
+      handler: async ({ service, app, ...patch }) => {
+        if (!knowledge) throw new Error("knowledge store not configured");
+        const now = new Date().toISOString();
+        return app
+          ? { app, service, saved: knowledge.setApp(app, service, patch, now) }
+          : { service, saved: knowledge.setService(service, patch, now) };
+      },
+    },
+    {
+      name: "list_app_services",
+      description: "List the services a project uses, with their playbooks and credential names.",
+      inputSchema: { type: "object", properties: { path: { type: "string" } }, required: ["path"] },
+      handler: async ({ path: appPath }) => {
+        const desc = await vault.describeProject(appPath);
+        const services = [...new Set((desc.credentials || []).flatMap((c) => c.services || []))];
+        const appName = appPath.split("/").filter(Boolean).pop();
+        return {
+          app: appPath,
+          services: services.map((s) => ({
+            service: s,
+            playbook: knowledge ? knowledge.getService(s) : null,
+            appNotes: knowledge ? knowledge.getApp(appName)?.[s] || null : null,
+            credentials: (desc.credentials || []).filter((c) => (c.services || []).includes(s)).map((c) => c.name),
+          })),
+        };
+      },
+    },
   ];
 }
 
@@ -225,7 +281,8 @@ async function main() {
   }
 
   const audit = auditLogger(path.join(dir, "audit.jsonl"));
-  const tools = buildTools({ vault, audit, client });
+  const knowledge = knowledgeStore(path.join(dir, "knowledge.json"));
+  const tools = buildTools({ vault, audit, client, knowledge });
   const { handle } = createMcpServer({ serverInfo: { name: "secrets-vault", version: "0.1.0" }, tools });
 
   process.stderr.write(

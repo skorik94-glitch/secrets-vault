@@ -1,6 +1,6 @@
 # ExecPlan — Secrets Vault MCP (рабочее имя «SSH Keeper»)
 
-- **Статус:** Stages 1–6 ✅ (44/44 юнит-тестов). Остался live-тест на реальных Infisical/Claude Code/Touch ID.
+- **Статус:** Stages 1–8 ✅ (45/45 юнит-тестов) — собран как плагин Claude Code. Остался live-тест на реальных Infisical/Claude Code/Touch ID.
 - **Дата:** 2026-06-06
 - **Владелец:** Иван (соло-билдер, vision/scope/решения)
 - **Исполнитель:** Claude Code (scoped-изменения, проверки, доки)
@@ -265,6 +265,22 @@ WebAuthn-passkeys, т.к. сервера нет — passkeys применимы,
 - [x] Покрыто тестами (крипта + двух-девайсная E2EE-модель) + двух-девайсный CLI-смоук. 44/44.
 **Follow-ups:** Keychain/Secure Enclave backend для приватного ключа (сейчас файл под passphrase);
 recovery-флоу; интеграция sync↔Infisical export; если будет sync-сервер — WebAuthn-passkeys как гейт к нему.
+
+### Stage 7 — Service knowledge / runbooks ✅ DONE (2026-06-06)
+Инвентаризация становится «умной»: per-service и per-app инструкции «как работать с сервисом».
+- [x] Стор знаний (`src/knowledge.mjs`): per-service + per-app runbooks; **значения strip'аются** (reference-only).
+- [x] MCP-инструменты: `get_service_playbook`, `set_service_note`, `list_app_services`.
+- [x] Покрыто тестами (CRUD + value-free инвариант). 45/45.
+**Follow-ups:** авто-сид заглушек ранбуков по найденным сервисам; синк знаний через E2EE-vault.
+
+### Stage 8 — Claude Code plugin packaging ✅ DONE (2026-06-06)
+«Включил плагин → всё гладко».
+- [x] `.claude-plugin/plugin.json` + `marketplace.json` + `.mcp.json` (`${CLAUDE_PLUGIN_ROOT}`):
+      установка через `/plugin marketplace add skorik94-glitch/secrets-vault` + `/plugin install`.
+- [x] Skill `skills/secrets-vault/SKILL.md` — учит агента проактивному reference-only поведению.
+- [x] Slash-команды: `doctor`, `services`, `playbook`, `onboard`.
+- [x] JSON провалидированы; структура по официальному формату плагинов.
+**Follow-ups:** `claude plugin validate` на машине с CLI; опц. SessionStart-hook со сводкой сервисов проекта.
 
 ## 9. Risks & assumptions
 

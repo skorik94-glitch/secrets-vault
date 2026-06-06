@@ -1,0 +1,11 @@
+{
+  "name": "secrets-vault",
+  "owner": { "name": "Ivan Skorikov" },
+  "plugins": [
+    {
+      "name": "secrets-vault",
+      "source": "./",
+      "description": "Local-first secrets + service-context copilot for Claude Code (reference-only, biometric-gated reveal, E2EE sync)."
+    }
+  ]
+}

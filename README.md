@@ -12,10 +12,24 @@ sees *references and metadata*, never values — except a single biometric-gated
 
 ## Status
 
-Assembled and unit-tested (44 tests): discover → onboard → vault → MCP →
-provisioning → E2EE cross-device sync. Pending live testing against a real
-Infisical / Claude Code / Touch ID. See [ExecPlan.md](./ExecPlan.md). Security
-model: [SECURITY.md](./SECURITY.md).
+Assembled and unit-tested (45 tests): discover → onboard → vault → MCP (with
+per-service runbooks) → provisioning → E2EE sync, packaged as a Claude Code
+plugin. Pending live testing against a real Infisical / Claude Code / Touch ID.
+See [ExecPlan.md](./ExecPlan.md). Security model: [SECURITY.md](./SECURITY.md).
+
+## Install as a Claude Code plugin
+
+Turn it on as a plugin so the agent proactively uses the vault whenever a task
+touches a secret or an external service:
+
+```
+/plugin marketplace add skorik94-glitch/secrets-vault
+/plugin install secrets-vault@secrets-vault
+```
+
+This bundles the MCP server, a skill (proactive reference-only behaviour), and
+slash commands: `/secrets-vault:doctor`, `:services`, `:playbook <service>`,
+`:onboard`. Manual alternative: `claude mcp add secrets-vault -- node "$(pwd)/src/mcp-server.mjs"`.
 
 ## Requirements
 
