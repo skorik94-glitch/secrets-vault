@@ -68,6 +68,13 @@ npx -y github:skorik94-glitch/secrets-vault scan --yes
 npx -y github:skorik94-glitch/secrets-vault discover --scan --yes
 ```
 
+Or via Homebrew:
+
+```bash
+brew install skorik94-glitch/tap/secrets-vault
+secrets-vault doctor
+```
+
 Or clone once and link a global `secrets-vault` command:
 
 ```bash

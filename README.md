@@ -40,6 +40,7 @@ zero install (public repo, zero deps):
 
 ```
 npx -y github:skorik94-glitch/secrets-vault doctor
+# or: brew install skorik94-glitch/tap/secrets-vault
 ```
 
 Copy-paste setup for Cursor, Windsurf, Claude Desktop, Cline, Zed, OpenAI Codex,
