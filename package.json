@@ -1,0 +1,23 @@
+{
+  "name": "secrets-inventory",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Stage 1 of the Secrets Vault MCP: read-only scanner that inventories secret-bearing files across the machine and audits leaks. Zero runtime dependencies by design.",
+  "bin": {
+    "secrets-vault": "src/cli-main.mjs",
+    "secrets-inventory": "src/cli.mjs"
+  },
+  "scripts": {
+    "doctor": "node src/doctor.mjs",
+    "scan": "node src/cli.mjs",
+    "discover": "node src/discover.mjs",
+    "onboard": "node src/onboard-cli.mjs",
+    "mcp": "node src/mcp-server.mjs",
+    "sync": "node src/sync-cli.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

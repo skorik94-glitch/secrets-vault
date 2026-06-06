@@ -1,0 +1,16 @@
+# Dependencies (the scanner itself has none, but tooling might)
+node_modules/
+
+# Scan output — CONTAINS A MAP OF WHERE YOUR SECRETS LIVE. Never commit.
+inventory-report*.json
+*.report.json
+.secrets-inventory/
+
+# Local secrets / Infisical link (added in later stages)
+.env
+.env.*
+!.env.example
+infisical.json
+
+# macOS
+.DS_Store
