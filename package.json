@@ -1,13 +1,17 @@
 {
-  "name": "secrets-inventory",
+  "name": "secrets-vault",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
-  "description": "Stage 1 of the Secrets Vault MCP: read-only scanner that inventories secret-bearing files across the machine and audits leaks. Zero runtime dependencies by design.",
+  "description": "Local-first, zero-dependency secrets + service-context copilot: inventory, per-service runbooks, reference-only MCP for AI agents (biometric-gated reveal), and E2EE cross-device sync.",
+  "homepage": "https://github.com/skorik94-glitch/secrets-vault",
+  "repository": { "type": "git", "url": "https://github.com/skorik94-glitch/secrets-vault.git" },
+  "license": "MIT",
+  "keywords": ["secrets", "credentials", "mcp", "infisical", "ssh", "e2ee", "vault", "claude", "codex"],
   "bin": {
     "secrets-vault": "src/cli-main.mjs",
     "secrets-inventory": "src/cli.mjs"
   },
+  "files": ["src", "native", "README.md", "SECURITY.md", "LICENSE"],
   "scripts": {
     "doctor": "node src/doctor.mjs",
     "scan": "node src/cli.mjs",
@@ -17,7 +21,5 @@
     "sync": "node src/sync-cli.mjs",
     "test": "node --test"
   },
-  "engines": {
-    "node": ">=20"
-  }
+  "engines": { "node": ">=20" }
 }

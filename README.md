@@ -33,6 +33,18 @@ Bundles the MCP server, a skill (proactive reference-only behaviour), and slash
 commands: `/secrets-vault:doctor`, `:services`, `:playbook <service>`, `:onboard`.
 Manual MCP-only alternative: `claude mcp add secrets-vault -- node "$(pwd)/src/mcp-server.mjs"`.
 
+## Use it from any client
+
+Not on Claude Code? It's also a plain MCP server + CLI you can run anywhere with
+zero install (public repo, zero deps):
+
+```
+npx -y github:skorik94-glitch/secrets-vault doctor
+```
+
+Copy-paste setup for Cursor, Windsurf, Claude Desktop, Cline, Zed, OpenAI Codex,
+and the raw CLI is in [INTEGRATIONS.md](./INTEGRATIONS.md).
+
 ## Requirements
 
 - Node.js >= 20 (the tool has **zero npm dependencies**)
