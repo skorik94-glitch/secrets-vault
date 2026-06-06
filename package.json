@@ -13,9 +13,11 @@
   },
   "files": ["src", "native", "README.md", "SECURITY.md", "LICENSE"],
   "scripts": {
+    "setup": "node src/setup.mjs",
     "doctor": "node src/doctor.mjs",
     "scan": "node src/cli.mjs",
     "discover": "node src/discover.mjs",
+    "triage": "node src/triage.mjs",
     "onboard": "node src/onboard-cli.mjs",
     "mcp": "node src/mcp-server.mjs",
     "sync": "node src/sync-cli.mjs",
