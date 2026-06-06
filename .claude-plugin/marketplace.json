@@ -4,6 +4,7 @@
   "plugins": [
     {
       "name": "secrets-vault",
+      "displayName": "Secrets Vault",
       "source": "./",
       "description": "Local-first secrets + service-context copilot for Claude Code (reference-only, biometric-gated reveal, E2EE sync)."
     }

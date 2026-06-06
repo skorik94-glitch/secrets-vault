@@ -19,17 +19,19 @@ See [ExecPlan.md](./ExecPlan.md). Security model: [SECURITY.md](./SECURITY.md).
 
 ## Install as a Claude Code plugin
 
-Turn it on as a plugin so the agent proactively uses the vault whenever a task
-touches a secret or an external service:
+**One line (terminal):**
 
 ```
-/plugin marketplace add skorik94-glitch/secrets-vault
-/plugin install secrets-vault@secrets-vault
+claude plugin marketplace add skorik94-glitch/secrets-vault && claude plugin install secrets-vault@secrets-vault
 ```
 
-This bundles the MCP server, a skill (proactive reference-only behaviour), and
-slash commands: `/secrets-vault:doctor`, `:services`, `:playbook <service>`,
-`:onboard`. Manual alternative: `claude mcp add secrets-vault -- node "$(pwd)/src/mcp-server.mjs"`.
+…or run `./install.sh`. Or, inside Claude Code: `/plugin` → add
+`skorik94-glitch/secrets-vault` → install. Then restart Claude Code (or
+`/reload-plugins`) and run `/secrets-vault:doctor`.
+
+Bundles the MCP server, a skill (proactive reference-only behaviour), and slash
+commands: `/secrets-vault:doctor`, `:services`, `:playbook <service>`, `:onboard`.
+Manual MCP-only alternative: `claude mcp add secrets-vault -- node "$(pwd)/src/mcp-server.mjs"`.
 
 ## Requirements
 

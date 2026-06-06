@@ -1,5 +1,6 @@
 {
   "name": "secrets-vault",
+  "displayName": "Secrets Vault",
   "description": "Local-first secrets + service-context copilot: inventory your credentials, keep per-service runbooks, access them reference-only with biometric-gated reveal, and sync E2EE across devices.",
   "version": "0.1.0",
   "author": { "name": "Ivan Skorikov" },
