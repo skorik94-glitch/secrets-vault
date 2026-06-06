@@ -51,14 +51,15 @@ secrets-vault discover --scan --yes     # which services you use + gaps/stale
 # Onboard into Infisical (needs a machine identity in the environment):
 export INFISICAL_API_URL=http://localhost:8080   # or cloud
 export INFISICAL_PROJECT_ID=...  INFISICAL_CLIENT_ID=...  INFISICAL_CLIENT_SECRET=...
-secrets-vault onboard --from .secrets-inventory/inventory-report-*.json          # dry-run
-secrets-vault onboard --from .secrets-inventory/inventory-report-*.json --apply --yes
+secrets-vault onboard --from ~/.secrets-vault/inventory-report-*.json          # dry-run
+secrets-vault onboard --from ~/.secrets-vault/inventory-report-*.json --apply --yes
 
 # Expose the vault to Claude Code:
 claude mcp add secrets-vault -- node "$(pwd)/src/mcp-server.mjs"
 ```
 
-`npm test` runs the suite. Reports go to `.secrets-inventory/` (mode 0600, gitignored).
+`npm test` runs the suite. Vault data (reports, knowledge, audit) lives in
+`~/.secrets-vault/` (mode 0600); override with `SECRETS_VAULT_DIR`.
 
 ## Commands
 

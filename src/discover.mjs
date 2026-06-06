@@ -14,6 +14,7 @@ import os from "node:os";
 import { readAllHistory } from "./browsers.mjs";
 import { aggregateServices, crossReference } from "./services.mjs";
 import { ensureConsent } from "./consent.mjs";
+import { vaultDir } from "./paths.mjs";
 
 const HELP = `secrets-discover — what services do you use? (from browser history)
 
@@ -167,7 +168,7 @@ async function main() {
     return;
   }
 
-  const outPath = o.out || path.resolve(".secrets-inventory", `service-surface-${tsSlug(new Date())}.json`);
+  const outPath = o.out || path.join(vaultDir(), `service-surface-${tsSlug(new Date())}.json`);
   await fs.mkdir(path.dirname(outPath), { recursive: true });
   await fs.writeFile(outPath, JSON.stringify(report, null, 2), { mode: 0o600 });
   process.stdout.write(buildSummary(report) + "\n");

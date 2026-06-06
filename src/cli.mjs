@@ -10,6 +10,7 @@ import { scan } from "./scan.mjs";
 import { DEFAULT_SKIP_DIRS } from "./patterns.mjs";
 import { buildSummaryText } from "./report.mjs";
 import { ensureConsent } from "./consent.mjs";
+import { vaultDir } from "./paths.mjs";
 
 const HELP = `secrets-inventory — read-only secret/credential scanner
 
@@ -82,7 +83,7 @@ async function main() {
   const roots = o.roots.length ? o.roots : [os.homedir()];
   const skipDirs = o.includeSkipped
     ? new Set(o.addSkip)
-    : new Set([...DEFAULT_SKIP_DIRS, ".secrets-inventory", ...o.addSkip]);
+    : new Set([...DEFAULT_SKIP_DIRS, ".secrets-inventory", ".secrets-vault", ...o.addSkip]);
 
   await ensureConsent({
     action: "scan local files for secrets/credentials",
@@ -114,7 +115,7 @@ async function main() {
     return;
   }
 
-  const outPath = o.out || path.resolve(".secrets-inventory", `inventory-report-${tsSlug(startedAt)}.json`);
+  const outPath = o.out || path.join(vaultDir(), `inventory-report-${tsSlug(startedAt)}.json`);
   await fs.mkdir(path.dirname(outPath), { recursive: true });
   await fs.writeFile(outPath, JSON.stringify(report, null, 2), { mode: 0o600 });
 

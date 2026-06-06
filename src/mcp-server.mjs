@@ -14,6 +14,7 @@ import { knowledgeStore } from "./knowledge.mjs";
 import { requireApproval } from "./biometric.mjs";
 import { createMcpServer } from "./mcp.mjs";
 import { startStdio } from "./jsonrpc.mjs";
+import { vaultDir } from "./paths.mjs";
 
 const PROFILES = {
   expo: ["supabase", "google", "apple", "expo"],
@@ -255,7 +256,7 @@ function latestReport(dir, prefix) {
 }
 
 async function main() {
-  const dir = process.env.SECRETS_VAULT_DIR || path.resolve(".secrets-inventory");
+  const dir = vaultDir();
   const scanPath = process.env.SECRETS_VAULT_SCAN_REPORT || latestReport(dir, "inventory-report-");
   const discPath = process.env.SECRETS_VAULT_DISCOVER_REPORT || latestReport(dir, "service-surface-");
   const scan = (scanPath && loadJSON(scanPath)) || {};

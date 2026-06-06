@@ -9,6 +9,7 @@ import path from "node:path";
 import { buildPlan, toPublicPlan } from "./onboard.mjs";
 import { infisicalClient } from "./infisical.mjs";
 import { ensureConsent } from "./consent.mjs";
+import { vaultDir } from "./paths.mjs";
 
 const HELP = `secrets-onboard — import discovered secrets into Infisical
 
@@ -157,7 +158,7 @@ async function main() {
 
   if (o.json) process.stdout.write(JSON.stringify(pub, null, 2) + "\n");
   else {
-    const outPath = o.out || path.resolve(".secrets-inventory", `import-plan-${tsSlug(new Date())}.json`);
+    const outPath = o.out || path.join(vaultDir(), `import-plan-${tsSlug(new Date())}.json`);
     await fs.mkdir(path.dirname(outPath), { recursive: true });
     await fs.writeFile(outPath, JSON.stringify(pub, null, 2), { mode: 0o600 });
     process.stdout.write(formatPlan(pub) + "\n");

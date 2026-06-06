@@ -7,10 +7,9 @@ import path from "node:path";
 import os from "node:os";
 import { createHash } from "node:crypto";
 import { generateDevice, deriveKey, encrypt, decrypt } from "./crypto.mjs";
+import { vaultDir } from "./paths.mjs";
 
-export function vaultHome() {
-  return process.env.SECRETS_VAULT_HOME || path.join(os.homedir(), ".secrets-vault");
-}
+export const vaultHome = vaultDir;
 const devicePath = () => path.join(vaultHome(), "device.json");
 
 export const deviceExists = () => fs.existsSync(devicePath());
