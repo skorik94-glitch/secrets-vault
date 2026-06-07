@@ -1,14 +1,33 @@
-# Secrets Vault (local-first, open source)
+# Secrets Vault
 
-One trusted, searchable place for a solo builder's scattered secrets — SSH keys,
-Google/Apple/Supabase/contractor credentials — exposed to your AI coding agent
-over MCP, so spinning up a new app can **reuse the same access** instead of
-hunting for keys across projects.
+**See every secret you've leaked across your machine — then give your AI agent access without ever exposing the values.**
 
-**Local-first. Open source. No honeypot.** Secrets live on your machine and in
-your own (self-hosted or cloud) [Infisical](https://infisical.com). The agent
-sees *references and metadata*, never values — except a single biometric-gated
-`reveal`. Optional zero-knowledge cross-device sync is a later, separate phase.
+[![GitHub stars](https://img.shields.io/github/stars/skorik94-glitch/secrets-vault?style=social)](https://github.com/skorik94-glitch/secrets-vault)
+![License: MIT](https://img.shields.io/badge/license-MIT-green)
+![Node ≥ 20](https://img.shields.io/badge/node-%E2%89%A5%2020-brightgreen)
+![Runtime deps: 0](https://img.shields.io/badge/runtime%20deps-0-blue)
+
+Local-first, open-source secrets + service-context copilot for AI coding agents
+(Claude Code, Cursor, Codex, Windsurf…). Inventory your scattered credentials,
+audit leaks, keep per-service runbooks, and let agents work with *references* —
+real values only behind Touch ID.
+
+```bash
+# One read-only command. No install, no account.
+npx -y github:skorik94-glitch/secrets-vault scan
+```
+
+```text
+  found     : 312 secret-bearing files          ← example output
+  [CRIT]  41  critical   [HIGH]  88  high
+  LEAKS / EXPOSURES (96): committed to git, world-readable keys, reused tokens
+```
+
+**Why it's different**
+- **Leak scanner** — finds secrets committed to git, world-readable keys, and the same token reused across projects.
+- **Safe for AI agents** — reference-only by default; real values only via a biometric-gated `reveal`. No raw keys in the agent's context.
+- **Trust by design** — local-first (your secrets never leave your machine), **zero runtime dependencies**, open source.
+- **Reuse access** — provision a new project with the same credentials in one move.
 
 ## Status
 
