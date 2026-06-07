@@ -249,7 +249,7 @@ export function buildTools({ vault, audit, approver, client, knowledge }) {
     {
       name: "remember",
       description:
-        "Log a crumb when something significant happens (a decision, a problem solved, a direction change, a learned constraint, a mistake). Always include WHY.",
+        "Log a crumb when something significant happens (a decision, a problem solved, a direction change, a learned constraint, a mistake). Always include WHY. Set higher salience for surprises/mistakes/key decisions; pass supersedes=<id> when this replaces an earlier crumb.",
       inputSchema: {
         type: "object",
         properties: {
@@ -260,6 +260,8 @@ export function buildTools({ vault, audit, approver, client, knowledge }) {
           revisitIf: { type: "string", description: "condition under which to reconsider" },
           refs: { type: "string" },
           tags: { type: "array", items: { type: "string" } },
+          salience: { type: "number", description: "1=routine, 3=normal, 5=surprising/critical (default 3)" },
+          supersedes: { type: "string", description: "id of an earlier crumb this one replaces (reconsolidation)" },
         },
         required: ["project", "what", "why"],
       },
@@ -267,10 +269,18 @@ export function buildTools({ vault, audit, approver, client, knowledge }) {
     },
     {
       name: "record_decision",
-      description: "Record a durable decision (title + why, plus rejected alternatives). Survives across sessions.",
+      description:
+        "Record a durable decision (title + why, plus rejected alternatives). Survives across sessions. Pass supersedes=<id> when this decision replaces an earlier one (reconsolidation).",
       inputSchema: {
         type: "object",
-        properties: { project: { type: "string" }, title: { type: "string" }, why: { type: "string" }, rejected: { type: "string" }, refs: { type: "string" } },
+        properties: {
+          project: { type: "string" },
+          title: { type: "string" },
+          why: { type: "string" },
+          rejected: { type: "string" },
+          refs: { type: "string" },
+          supersedes: { type: "string", description: "id of an earlier decision this one replaces" },
+        },
         required: ["project", "title", "why"],
       },
       handler: async ({ project, ...c }) => memoryStore(project).recordDecision(c),

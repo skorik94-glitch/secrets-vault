@@ -9,10 +9,19 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { randomUUID } from "node:crypto";
 
 const clean = (o) => {
   for (const k of Object.keys(o)) if (o[k] === undefined || o[k] === null || o[k] === "") delete o[k];
   return o;
+};
+
+// Salience = how much a crumb matters (research: surprise/novelty marks importance).
+// 1 = routine, 3 = normal, 5 = surprising/critical (a mistake, a key decision).
+const clampSalience = (s) => {
+  const n = Number(s);
+  if (!Number.isFinite(n)) return 3;
+  return Math.max(1, Math.min(5, Math.round(n)));
 };
 
 export function memoryStore(project, clock = () => new Date().toISOString()) {
@@ -62,6 +71,7 @@ export function memoryStore(project, clock = () => new Date().toISOString()) {
   const remember = (c = {}) => {
     ensure();
     const entry = clean({
+      id: randomUUID().slice(0, 8),
       ts: clock(),
       what: c.what,
       why: c.why,
@@ -69,6 +79,8 @@ export function memoryStore(project, clock = () => new Date().toISOString()) {
       revisitIf: c.revisitIf,
       refs: c.refs,
       tags: c.tags,
+      salience: clampSalience(c.salience),
+      supersedes: c.supersedes, // id of a crumb this one replaces (reconsolidation)
     });
     fs.appendFileSync(P.journal, JSON.stringify(entry) + "\n");
     return entry;
@@ -76,28 +88,57 @@ export function memoryStore(project, clock = () => new Date().toISOString()) {
 
   const recordDecision = (c = {}) => {
     ensure();
-    const entry = clean({ ts: clock(), title: c.title, why: c.why, rejected: c.rejected, refs: c.refs });
+    const entry = clean({
+      id: randomUUID().slice(0, 8),
+      ts: clock(),
+      title: c.title,
+      why: c.why,
+      rejected: c.rejected,
+      refs: c.refs,
+      supersedes: c.supersedes, // id of a decision this one replaces
+    });
     fs.appendFileSync(P.decisions, JSON.stringify(entry) + "\n");
     return entry;
   };
 
-  const journal = (limit = 50) => readJsonl(P.journal).slice(-limit);
-  const decisionLog = (limit = 100) => readJsonl(P.decisions).slice(-limit);
+  // Reconsolidation: drop any entry that a later entry has superseded — keep current truth.
+  const active = (entries) => {
+    const sup = new Set(entries.flatMap((e) => (e.supersedes ? [e.supersedes] : [])));
+    return entries.filter((e) => !e.id || !sup.has(e.id));
+  };
+  const journal = (limit = 50) => active(readJsonl(P.journal)).slice(-limit);
+  const decisionLog = (limit = 100) => active(readJsonl(P.decisions)).slice(-limit);
 
-  // The retrieval call: load everything an agent needs to regain context.
-  const recall = ({ limit = 20 } = {}) => ({
-    project,
-    state: getState(),
-    decisions: decisionLog(50),
-    crumbs: journal(limit),
-    hasMemory: fs.existsSync(P.state) || fs.existsSync(P.journal),
-  });
+  // Retrieval: surface the MOST SALIENT crumbs first (surprises / key decisions /
+  // mistakes), then recency — not just the latest noise.
+  const recall = ({ limit = 20 } = {}) => {
+    const crumbs = active(readJsonl(P.journal))
+      .sort((a, b) => (b.salience || 3) - (a.salience || 3) || String(b.ts).localeCompare(String(a.ts)))
+      .slice(0, limit);
+    return {
+      project,
+      state: getState(),
+      decisions: decisionLog(50),
+      crumbs,
+      hasMemory: fs.existsSync(P.state) || fs.existsSync(P.journal),
+    };
+  };
 
   // Consolidation ("sleep"): without newState, return raw crumbs for the agent to
   // compress; with newState, write it and archive the raw journal.
   const consolidate = ({ newState } = {}) => {
     const raw = readJsonl(P.journal);
-    if (newState == null) return { mode: "read", count: raw.length, raw, state: getState() };
+    if (newState == null) {
+      const live = active(raw);
+      return {
+        mode: "read",
+        count: live.length,
+        keep: live.filter((e) => (e.salience || 3) >= 4), // high-salience → keep / generalize
+        prune: live.filter((e) => (e.salience || 3) <= 2), // low-salience → likely drop
+        crumbs: live,
+        state: getState(),
+      };
+    }
     ensure();
     fs.mkdirSync(P.archive, { recursive: true });
     if (fs.existsSync(P.journal)) {

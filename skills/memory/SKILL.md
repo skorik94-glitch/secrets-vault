@@ -33,6 +33,15 @@ Call `remember(project, what, why, …)` on each significant event:
 Always include **why** — the reasoning is the valuable part, not the what. Routine
 edits don't need a crumb (git already records those).
 
+**Salience** (1–5): set it higher for *surprises*, mistakes, and key decisions —
+these are what `recall` surfaces first (a small deviation from expectation is exactly
+what's worth remembering). Default 3; use 5 for "this changes how the project works".
+
+**Reconsolidation:** when new information makes an earlier crumb/decision wrong or
+outdated, log the corrected one with `supersedes=<old id>` (ids are in `recall`/
+`search_memory` output). The old entry drops out of current memory but stays in
+history/search — so memory stays *correct* without hoarding contradictions.
+
 For durable architectural choices, also call `record_decision(project, title, why, …)`.
 
 ## Keep the living state current
@@ -41,10 +50,12 @@ reads first. Keep it tight: current goal, architecture in one breath, open threa
 gotchas. It is the map; the journal is the territory.
 
 ## Before finishing / when the journal grows — CONSOLIDATE ("sleep")
-Call `consolidate(project)` to get the raw crumbs, compress them into an updated state
-(merge into decisions where durable), then call `consolidate(project, newState=<summary>)`
-to write the new state and archive the raw journal. Logging without consolidation is
-insomnia — periodically sleep.
+Call `consolidate(project)`. It returns the crumbs split into **keep** (high-salience —
+generalize these into the state, fold durable ones into decisions) and **prune**
+(low-salience noise — drop). Replay them like sleep does: extract the patterns, merge
+into the living state, discard the noise. Then call
+`consolidate(project, newState=<summary>)` to write the new state and archive the raw
+journal. Logging without consolidation is insomnia — periodically sleep.
 
 ## Local context — read the right docs for the file (fractal docs)
 Before editing a file, call `local_context(path, project)` to load the nearest
