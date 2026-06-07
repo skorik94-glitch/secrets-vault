@@ -20,3 +20,6 @@ marketing/
 ExecPlan.md
 .secrets-vault/
 .secrets-inventory/
+
+# local preview/dev config
+.claude/
