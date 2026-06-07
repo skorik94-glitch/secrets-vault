@@ -15,5 +15,6 @@ infisical.json
 # macOS
 .DS_Store
 
-# Internal go-to-market docs (not for the public repo)
+# Internal strategy / roadmap (not for the public repo)
 marketing/
+ExecPlan.md
