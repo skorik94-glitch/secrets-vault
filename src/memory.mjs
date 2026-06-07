@@ -108,5 +108,35 @@ export function memoryStore(project, clock = () => new Date().toISOString()) {
     return { mode: "written", archivedCrumbs: raw.length };
   };
 
-  return { getState, setState, remember, recordDecision, journal, decisionLog, recall, consolidate, paths: P };
+  // Keyword search across crumbs + decisions, INCLUDING archived (consolidated)
+  // history — so the "why" from months ago is still findable on a long project.
+  const search = (query, { limit = 20 } = {}) => {
+    const terms = String(query || "").toLowerCase().split(/\s+/).filter(Boolean);
+    if (!terms.length) return { query, crumbs: [], decisions: [], stateMatch: false };
+    const score = (v) => {
+      const t = String(Array.isArray(v) ? v.join(" ") : (v ?? "")).toLowerCase();
+      return terms.reduce((s, w) => s + (t.includes(w) ? 1 : 0), 0);
+    };
+    const rank = (items, fields) =>
+      items
+        .map((it) => ({ it, s: fields.reduce((a, f) => a + score(it[f]), 0) }))
+        .filter((x) => x.s > 0)
+        .sort((a, b) => b.s - a.s)
+        .slice(0, limit)
+        .map((x) => x.it);
+    const archived = [];
+    try {
+      for (const f of fs.readdirSync(P.archive)) if (f.endsWith(".jsonl")) archived.push(...readJsonl(path.join(P.archive, f)));
+    } catch {
+      /* no archive */
+    }
+    return {
+      query,
+      crumbs: rank([...archived, ...readJsonl(P.journal)], ["what", "why", "rejected", "revisitIf", "refs", "tags"]),
+      decisions: rank(readJsonl(P.decisions), ["title", "why", "rejected", "refs"]),
+      stateMatch: score(getState()) > 0,
+    };
+  };
+
+  return { getState, setState, remember, recordDecision, journal, decisionLog, recall, search, consolidate, paths: P };
 }

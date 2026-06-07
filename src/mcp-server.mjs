@@ -298,6 +298,17 @@ export function buildTools({ vault, audit, approver, client, knowledge }) {
       handler: async ({ project, newState }) => memoryStore(project).consolidate({ newState }),
     },
     {
+      name: "search_memory",
+      description:
+        "Search this project's memory (crumbs + decisions, INCLUDING archived/consolidated history) by keywords. Use on large/long projects to find WHY something was done.",
+      inputSchema: {
+        type: "object",
+        properties: { project: { type: "string" }, query: { type: "string" }, limit: { type: "number" } },
+        required: ["project", "query"],
+      },
+      handler: async ({ project, query, limit }) => memoryStore(project).search(query, { limit }),
+    },
+    {
       name: "local_context",
       description:
         "Load fractal docs for a path — the nearest CLAUDE.md/AGENTS.md from repo root down to the file's folder (global → local). Call before editing a file so you read the right LOCAL context, not a global blob.",
