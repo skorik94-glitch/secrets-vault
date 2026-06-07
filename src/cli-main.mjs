@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Unified entrypoint: `secrets-vault <command> [...args]`.
+// Unified entrypoint: `hush <command> [...args]`.
 // Dispatches to the per-command scripts, passing stdio through.
 
 import { spawn } from "node:child_process";
@@ -19,7 +19,7 @@ const COMMANDS = {
   sync: "sync-cli.mjs",
 };
 
-const USAGE = `secrets-vault <command> [options]
+const USAGE = `hush <command> [options]
 
 Commands:
   setup     print/write the MCP config for a client (cursor, codex, …)
@@ -31,7 +31,7 @@ Commands:
   mcp       run the MCP server for Claude Code / any MCP client (stdio)
   sync      E2EE cross-device vault (per-device keys + biometric)
 
-Run 'secrets-vault <command> --help' for command options.
+Run 'hush <command> --help' for command options.
 `;
 
 const [cmd, ...rest] = process.argv.slice(2);

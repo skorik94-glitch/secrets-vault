@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// secrets-vault doctor — preflight check of prerequisites before you run things.
+// hush doctor — preflight check of prerequisites before you run things.
 
 import { spawnSync } from "node:child_process";
 
@@ -24,7 +24,7 @@ export function gatherChecks(env = process.env) {
 }
 
 export function formatDoctor(checks) {
-  const L = ["secrets-vault doctor", ""];
+  const L = ["hush doctor", ""];
   for (const c of checks) {
     const mark = c.ok ? "OK  " : c.required ? "MISS" : "opt ";
     L.push(`  [${mark}] ${c.name} — ${c.detail}`);

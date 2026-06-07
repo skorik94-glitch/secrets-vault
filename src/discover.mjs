@@ -24,7 +24,7 @@ Usage:
 Options:
   --from <report.json>   Cross-reference against a prior filesystem scan report
   --scan                 Run a fresh filesystem scan first (slow) to cross-reference
-  --out <file>           JSON output path. Default: .secrets-inventory/service-surface-<ts>.json
+  --out <file>           JSON output path. Default: .hush/service-surface-<ts>.json
   --json                 Print full JSON to stdout instead of a file
   --top <n>              Show top N services in the summary (default 40)
   --quiet                Suppress progress
@@ -69,7 +69,7 @@ async function fsServicesFrom(o, log) {
     log("running filesystem scan (this can take a while)…");
     const r = await scan({
       roots: [os.homedir()],
-      skipDirs: new Set([...DEFAULT_SKIP_DIRS, ".secrets-inventory"]),
+      skipDirs: new Set([...DEFAULT_SKIP_DIRS, ".hush"]),
       content: true,
     });
     return Object.keys(r.stats.byService);

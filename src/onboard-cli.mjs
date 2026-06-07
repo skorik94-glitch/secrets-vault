@@ -22,7 +22,7 @@ Options:
   --apply                Actually write to Infisical (default: dry-run)
   --update               Overwrite existing secrets (PATCH) instead of skipping
   --api-url <url>        Infisical API URL (or INFISICAL_API_URL; default cloud)
-  --out <file>           Plan JSON path (default: .secrets-inventory/import-plan-<ts>.json)
+  --out <file>           Plan JSON path (default: .hush/import-plan-<ts>.json)
   --json                 Print plan JSON to stdout
   --yes                  Consent (required non-interactively, esp. for --apply)
   --quiet                Suppress progress

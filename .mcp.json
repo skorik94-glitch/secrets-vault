@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "secrets-vault": {
+    "hush": {
       "command": "node",
       "args": ["${CLAUDE_PLUGIN_ROOT}/src/mcp-server.mjs"]
     }

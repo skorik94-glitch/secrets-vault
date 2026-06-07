@@ -60,7 +60,7 @@ test("MCP server speaks stdio JSON-RPC end-to-end", { timeout: 15000 }, async ()
   try {
     await done;
     const init = responses.find((r) => r.id === 1);
-    assert.equal(init.result.serverInfo.name, "secrets-vault");
+    assert.equal(init.result.serverInfo.name, "hush");
     const list = responses.find((r) => r.id === 2);
     assert.ok(list.result.tools.some((t) => t.name === "reveal"));
     const called = responses.find((r) => r.id === 3);

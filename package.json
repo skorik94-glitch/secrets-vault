@@ -1,17 +1,35 @@
 {
-  "name": "secrets-vault",
+  "name": "hush",
   "version": "0.1.0",
   "type": "module",
   "description": "Local-first, zero-dependency secrets + service-context copilot: inventory, per-service runbooks, reference-only MCP for AI agents (biometric-gated reveal), and E2EE cross-device sync.",
-  "homepage": "https://github.com/skorik94-glitch/secrets-vault",
-  "repository": { "type": "git", "url": "https://github.com/skorik94-glitch/secrets-vault.git" },
-  "license": "MIT",
-  "keywords": ["secrets", "credentials", "mcp", "infisical", "ssh", "e2ee", "vault", "claude", "codex"],
-  "bin": {
-    "secrets-vault": "src/cli-main.mjs",
-    "secrets-inventory": "src/cli.mjs"
+  "homepage": "https://github.com/skorik94-glitch/hush",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skorik94-glitch/hush.git"
   },
-  "files": ["src", "native", "README.md", "SECURITY.md", "LICENSE"],
+  "license": "MIT",
+  "keywords": [
+    "secrets",
+    "credentials",
+    "mcp",
+    "infisical",
+    "ssh",
+    "e2ee",
+    "vault",
+    "claude",
+    "codex"
+  ],
+  "bin": {
+    "hush": "src/cli-main.mjs"
+  },
+  "files": [
+    "src",
+    "native",
+    "README.md",
+    "SECURITY.md",
+    "LICENSE"
+  ],
   "scripts": {
     "setup": "node src/setup.mjs",
     "doctor": "node src/doctor.mjs",
@@ -23,5 +41,7 @@
     "sync": "node src/sync-cli.mjs",
     "test": "node --test"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

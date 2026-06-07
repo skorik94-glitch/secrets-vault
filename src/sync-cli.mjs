@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// secrets-vault sync — E2EE cross-device vault. The remote (a file you sync via
+// hush sync — E2EE cross-device vault. The remote (a file you sync via
 // iCloud/Dropbox/git) only ever holds ciphertext. Private keys never leave the
 // device; unlocking is gated by biometric approval.
 
@@ -9,10 +9,10 @@ import { getOrCreateDevice, loadDevice, unlockPrivateKey, vaultHome } from "./ke
 import { initVault, unlock, authorizeDevice, updateSecrets, status } from "./sync.mjs";
 import { requireApproval } from "./biometric.mjs";
 
-const HELP = `secrets-vault sync — E2EE cross-device vault
+const HELP = `hush sync — E2EE cross-device vault
 
 Usage:
-  secrets-vault sync <command> [options]
+  hush sync <command> [options]
 
 Commands:
   init --secrets <file.json>   Create the encrypted vault from a secrets JSON (this device)
@@ -23,7 +23,7 @@ Commands:
   status                       Show authorized devices + last update (no secret values)
 
 Options:
-  --remote <path>   Encrypted vault file (or SECRETS_VAULT_SYNC_PATH; default: ~/.secrets-vault/vault.enc.json)
+  --remote <path>   Encrypted vault file (or SECRETS_VAULT_SYNC_PATH; default: ~/.hush/vault.enc.json)
   --label <name>    Device label (for init)
 
 Env: SECRETS_VAULT_PASSPHRASE (protects this device's private key at rest).`;

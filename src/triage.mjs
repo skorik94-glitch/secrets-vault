@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// secrets-vault triage — prioritize and (optionally) fix the leaks found by `scan`.
+// hush triage — prioritize and (optionally) fix the leaks found by `scan`.
 // Prints COUNTS to the terminal; writes the detailed list (with paths) to a local
 // 0600 file, not to stdout. --fix-perms can chmod 600 world-readable key files.
 
@@ -30,7 +30,7 @@ export function buildTriage(report) {
 function latestReport() {
   const dir = vaultDir();
   const m = readdirSync(dir).filter((n) => n.startsWith("inventory-report-") && n.endsWith(".json")).sort();
-  if (!m.length) throw new Error(`no scan report in ${dir} — run \`secrets-vault scan --yes\` first`);
+  if (!m.length) throw new Error(`no scan report in ${dir} — run \`hush scan --yes\` first`);
   return path.join(dir, m[m.length - 1]);
 }
 
@@ -41,10 +41,10 @@ function detailText(t) {
     return L.join("\n") + "\n";
   };
   return [
-    "# secrets-vault leak triage",
+    "# hush leak triage",
     "",
     sec("P1 — committed to git (rotate + purge history)", t.p1, "These secrets are in git history. Rotate them, then scrub history (git filter-repo / BFG)."),
-    sec("P2 — group/world-readable (tighten perms)", t.p2, "Run `secrets-vault triage --fix-perms --apply` to chmod 600 key files."),
+    sec("P2 — group/world-readable (tighten perms)", t.p2, "Run `hush triage --fix-perms --apply` to chmod 600 key files."),
     sec("P3 — untracked, not gitignored (add to .gitignore)", t.p3, "Add these to .gitignore so they aren't committed."),
   ].join("\n");
 }

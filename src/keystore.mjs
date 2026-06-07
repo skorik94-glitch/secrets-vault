@@ -34,7 +34,7 @@ export function getOrCreateDevice({ label, passphrase }) {
 
 export function loadDevice() {
   const p = devicePath();
-  if (!fs.existsSync(p)) throw new Error("no device on this machine — run `secrets-vault sync init` first");
+  if (!fs.existsSync(p)) throw new Error("no device on this machine — run `hush sync init` first");
   return JSON.parse(fs.readFileSync(p, "utf8"));
 }
 

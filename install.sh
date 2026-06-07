@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# One-command install of the Secrets Vault plugin for Claude Code.
+# One-command install of the Hush plugin for Claude Code.
 # Requires the `claude` CLI on PATH. For a private repo, your git credentials
-# (gh auth / SSH) must allow cloning skorik94-glitch/secrets-vault.
+# (gh auth / SSH) must allow cloning skorik94-glitch/hush.
 
-REPO="skorik94-glitch/secrets-vault"
-PLUGIN="secrets-vault@secrets-vault"
+REPO="skorik94-glitch/hush"
+PLUGIN="hush@hush"
 
 if ! command -v claude >/dev/null 2>&1; then
   echo "error: the 'claude' CLI is not on your PATH. Open Claude Code and use /plugin instead." >&2
@@ -20,5 +20,5 @@ claude plugin install "$PLUGIN"
 echo "3/3 Done."
 echo
 echo "Restart Claude Code (or run /reload-plugins), then try:"
-echo "  /secrets-vault:doctor"
-echo "  /secrets-vault:services"
+echo "  /hush:doctor"
+echo "  /hush:services"

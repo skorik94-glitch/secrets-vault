@@ -4,7 +4,7 @@ node_modules/
 # Scan output — CONTAINS A MAP OF WHERE YOUR SECRETS LIVE. Never commit.
 inventory-report*.json
 *.report.json
-.secrets-inventory/
+.hush/
 
 # Local secrets / Infisical link (added in later stages)
 .env
@@ -18,3 +18,5 @@ infisical.json
 # Internal strategy / roadmap (not for the public repo)
 marketing/
 ExecPlan.md
+.secrets-vault/
+.secrets-inventory/

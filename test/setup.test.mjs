@@ -6,13 +6,13 @@ import { mergedConfig, clientPath, expandHome, SERVER, CLIENTS } from "../src/se
 test("mergedConfig adds our server without clobbering existing", () => {
   const m = mergedConfig({ mcpServers: { other: { command: "x" } } });
   assert.equal(m.mcpServers.other.command, "x");
-  assert.equal(m.mcpServers["secrets-vault"].command, "npx");
-  assert.ok(m.mcpServers["secrets-vault"].args.includes("mcp"));
+  assert.equal(m.mcpServers["hush"].command, "npx");
+  assert.ok(m.mcpServers["hush"].args.includes("mcp"));
 });
 
 test("mergedConfig handles empty / undefined", () => {
-  assert.ok(mergedConfig({}).mcpServers["secrets-vault"]);
-  assert.ok(mergedConfig(undefined).mcpServers["secrets-vault"]);
+  assert.ok(mergedConfig({}).mcpServers["hush"]);
+  assert.ok(mergedConfig(undefined).mcpServers["hush"]);
 });
 
 test("clientPath + expandHome", () => {

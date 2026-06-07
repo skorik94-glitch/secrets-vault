@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// secrets-inventory — read-only scanner (Stage 1 of the Secrets Vault MCP).
+// hush — read-only scanner (Stage 1 of the Hush MCP).
 // Inventories secret-bearing files, maps them to projects, and audits leaks.
 // No writes outside the chosen output file. No network.
 
@@ -12,14 +12,14 @@ import { buildSummaryText } from "./report.mjs";
 import { ensureConsent } from "./consent.mjs";
 import { vaultDir } from "./paths.mjs";
 
-const HELP = `secrets-inventory — read-only secret/credential scanner
+const HELP = `hush — read-only secret/credential scanner
 
 Usage:
   node src/cli.mjs [options]
 
 Options:
   --root <path>          Root to scan (repeatable). Default: $HOME
-  --out <file>           JSON report path. Default: .secrets-inventory/inventory-report-<ts>.json
+  --out <file>           JSON report path. Default: .hush/inventory-report-<ts>.json
   --json                 Print full JSON to stdout instead of writing a file
   --no-content           Skip content sniffing (filename rules only; faster)
   --max-file-size <n>    Max file size (bytes) to sniff. Default: 262144
@@ -83,7 +83,7 @@ async function main() {
   const roots = o.roots.length ? o.roots : [os.homedir()];
   const skipDirs = o.includeSkipped
     ? new Set(o.addSkip)
-    : new Set([...DEFAULT_SKIP_DIRS, ".secrets-inventory", ".secrets-vault", ...o.addSkip]);
+    : new Set([...DEFAULT_SKIP_DIRS, ".hush", ".secrets-vault", ".secrets-inventory", ...o.addSkip]);
 
   await ensureConsent({
     action: "scan local files for secrets/credentials",

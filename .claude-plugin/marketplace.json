@@ -1,10 +1,10 @@
 {
-  "name": "secrets-vault",
+  "name": "hush",
   "owner": { "name": "Ivan Skorikov" },
   "plugins": [
     {
-      "name": "secrets-vault",
-      "displayName": "Secrets Vault",
+      "name": "hush",
+      "displayName": "Hush",
       "source": "./",
       "description": "Local-first secrets + service-context copilot for Claude Code (reference-only, biometric-gated reveal, E2EE sync)."
     }

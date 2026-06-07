@@ -5,13 +5,13 @@ the repo is public, you can run either with `npx` straight from GitHub — no cl
 no install step (zero deps = fast):
 
 ```
-npx -y github:skorik94-glitch/secrets-vault <command>
+npx -y github:skorik94-glitch/hush <command>
 ```
 
 `<command>` is one of `doctor`, `scan`, `discover`, `onboard`, `mcp`, `sync`.
-(After a future npm publish this becomes `npx -y secrets-vault <command>`.)
+(After a future npm publish this becomes `npx -y hush <command>`.)
 
-Vault data lives centrally in `~/.secrets-vault/` for every surface, so what you
+Vault data lives centrally in `~/.hush/` for every surface, so what you
 scan once is visible everywhere. Override with `SECRETS_VAULT_DIR`.
 
 ---
@@ -21,8 +21,8 @@ scan once is visible everywhere. Override with `SECRETS_VAULT_DIR`.
 Bundles the MCP server + a proactive skill + slash commands.
 
 ```
-claude plugin marketplace add skorik94-glitch/secrets-vault
-claude plugin install secrets-vault@secrets-vault
+claude plugin marketplace add skorik94-glitch/hush
+claude plugin install hush@hush
 ```
 
 ## Claude Desktop / Cursor / Windsurf / Cline / Zed (any MCP client)
@@ -32,9 +32,9 @@ Add this to the client's MCP config (same shape everywhere):
 ```json
 {
   "mcpServers": {
-    "secrets-vault": {
+    "hush": {
       "command": "npx",
-      "args": ["-y", "github:skorik94-glitch/secrets-vault", "mcp"]
+      "args": ["-y", "github:skorik94-glitch/hush", "mcp"]
     }
   }
 }
@@ -49,37 +49,37 @@ Config file locations (typical):
 ## OpenAI Codex
 
 ```bash
-codex mcp add secrets-vault -- npx -y github:skorik94-glitch/secrets-vault mcp
+codex mcp add hush -- npx -y github:skorik94-glitch/hush mcp
 ```
 
 …or in `~/.codex/config.toml`:
 
 ```toml
-[mcp_servers.secrets-vault]
+[mcp_servers.hush]
 command = "npx"
-args = ["-y", "github:skorik94-glitch/secrets-vault", "mcp"]
+args = ["-y", "github:skorik94-glitch/hush", "mcp"]
 ```
 
 ## Plain CLI (no AI client)
 
 ```bash
-npx -y github:skorik94-glitch/secrets-vault doctor
-npx -y github:skorik94-glitch/secrets-vault scan --yes
-npx -y github:skorik94-glitch/secrets-vault discover --scan --yes
+npx -y github:skorik94-glitch/hush doctor
+npx -y github:skorik94-glitch/hush scan --yes
+npx -y github:skorik94-glitch/hush discover --scan --yes
 ```
 
 Or via Homebrew:
 
 ```bash
-brew install skorik94-glitch/tap/secrets-vault
-secrets-vault doctor
+brew install skorik94-glitch/tap/hush
+hush doctor
 ```
 
-Or clone once and link a global `secrets-vault` command:
+Or clone once and link a global `hush` command:
 
 ```bash
-git clone https://github.com/skorik94-glitch/secrets-vault && cd secrets-vault && npm link
-secrets-vault doctor
+git clone https://github.com/skorik94-glitch/hush && cd hush && npm link
+hush doctor
 ```
 
 ## Developers (library / Claude Agent SDK / API)

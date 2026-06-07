@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// secrets-vault MCP server (stdio, reference-only). Exposes the vault to an
+// hush MCP server (stdio, reference-only). Exposes the vault to an
 // MCP client (e.g. Claude Code). Metadata tools never return secret values;
 // reveal/materialize_file are gated by biometric approval and audited.
 //
@@ -284,10 +284,10 @@ async function main() {
   const audit = auditLogger(path.join(dir, "audit.jsonl"));
   const knowledge = knowledgeStore(path.join(dir, "knowledge.json"));
   const tools = buildTools({ vault, audit, client, knowledge });
-  const { handle } = createMcpServer({ serverInfo: { name: "secrets-vault", version: "0.1.0" }, tools });
+  const { handle } = createMcpServer({ serverInfo: { name: "hush", version: "0.1.0" }, tools });
 
   process.stderr.write(
-    `secrets-vault MCP up · backend:${backend} · scan:${scanPath ? path.basename(scanPath) : "none"} · ` +
+    `hush MCP up · backend:${backend} · scan:${scanPath ? path.basename(scanPath) : "none"} · ` +
       `${(scan.files || []).length} local credentials\n`,
   );
   startStdio(handle);

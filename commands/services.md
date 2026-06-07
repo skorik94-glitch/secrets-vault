@@ -2,7 +2,7 @@
 description: Overview of the services you use, where each credential lives, and any leaks
 ---
 
-Give the user an overview of their secret/service surface using the secrets-vault
+Give the user an overview of their secret/service surface using the hush
 MCP tools. Do NOT reveal any secret values.
 
 1. Call `list_services` for the services they have credentials for.

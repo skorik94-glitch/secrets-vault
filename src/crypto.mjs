@@ -56,7 +56,7 @@ export function generateDevice() {
 }
 
 function kekFromShared(shared, salt) {
-  return Buffer.from(hkdfSync("sha256", shared, salt, Buffer.from("secrets-vault-kek/v1"), 32));
+  return Buffer.from(hkdfSync("sha256", shared, salt, Buffer.from("hush-kek/v1"), 32));
 }
 
 /** Wrap (encrypt) a VEK to a recipient's public key. */

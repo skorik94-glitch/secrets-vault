@@ -1,6 +1,6 @@
 ---
-name: secrets-vault
-description: Use whenever a task touches an external service's access — credentials/secrets/SSH keys (Supabase, Apple, Google, GitHub, Stripe, AWS, …), accessing or rotating them, wiring a new project's access, or making changes in a third-party service console. Surfaces credential references and per-service runbooks via the secrets-vault MCP tools; reveals actual values only through a biometric gate.
+name: hush
+description: Use whenever a task touches an external service's access — credentials/secrets/SSH keys (Supabase, Apple, Google, GitHub, Stripe, AWS, …), accessing or rotating them, wiring a new project's access, or making changes in a third-party service console. Surfaces credential references and per-service runbooks via the hush MCP tools; reveals actual values only through a biometric gate.
 ---
 
 # Working with the user's secrets & services
