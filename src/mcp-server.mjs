@@ -12,6 +12,7 @@ import { infisicalClient } from "./infisical.mjs";
 import { auditLogger } from "./audit.mjs";
 import { knowledgeStore } from "./knowledge.mjs";
 import { memoryStore } from "./memory.mjs";
+import { localContext, docMap } from "./docs.mjs";
 import { requireApproval } from "./biometric.mjs";
 import { createMcpServer } from "./mcp.mjs";
 import { startStdio } from "./jsonrpc.mjs";
@@ -295,6 +296,23 @@ export function buildTools({ vault, audit, approver, client, knowledge }) {
         required: ["project"],
       },
       handler: async ({ project, newState }) => memoryStore(project).consolidate({ newState }),
+    },
+    {
+      name: "local_context",
+      description:
+        "Load fractal docs for a path — the nearest CLAUDE.md/AGENTS.md from repo root down to the file's folder (global → local). Call before editing a file so you read the right LOCAL context, not a global blob.",
+      inputSchema: {
+        type: "object",
+        properties: { path: { type: "string" }, project: { type: "string" } },
+        required: ["path", "project"],
+      },
+      handler: async ({ path: p, project }) => localContext(p, project),
+    },
+    {
+      name: "doc_map",
+      description: "Map which folders have fractal docs vs not (coverage + gaps), so you can fill the missing ones.",
+      inputSchema: { type: "object", properties: { project: { type: "string" } }, required: ["project"] },
+      handler: async ({ project }) => docMap(project),
     },
   ];
 }

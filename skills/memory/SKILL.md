@@ -46,6 +46,12 @@ Call `consolidate(project)` to get the raw crumbs, compress them into an updated
 to write the new state and archive the raw journal. Logging without consolidation is
 insomnia — periodically sleep.
 
+## Local context — read the right docs for the file (fractal docs)
+Before editing a file, call `local_context(path, project)` to load the nearest
+CLAUDE.md/AGENTS.md from repo root down to that file's folder — act on the *local*
+rules, not a global blob. Keep folder-level docs short and current; use
+`doc_map(project)` to see where docs are missing and fill the important gaps.
+
 ## Principles (apply throughout)
 - **Meaning before code.** Understand the why; restate the task.
 - **Fractal docs.** Keep context local — repo / module / folder level — so the right
