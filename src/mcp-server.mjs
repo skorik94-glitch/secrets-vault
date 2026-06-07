@@ -11,6 +11,7 @@ import { reportVault, infisicalVault } from "./vault.mjs";
 import { infisicalClient } from "./infisical.mjs";
 import { auditLogger } from "./audit.mjs";
 import { knowledgeStore } from "./knowledge.mjs";
+import { memoryStore } from "./memory.mjs";
 import { requireApproval } from "./biometric.mjs";
 import { createMcpServer } from "./mcp.mjs";
 import { startStdio } from "./jsonrpc.mjs";
@@ -232,6 +233,68 @@ export function buildTools({ vault, audit, approver, client, knowledge }) {
           })),
         };
       },
+    },
+    {
+      name: "recall",
+      description:
+        "Recall this project's memory — living state, recent decisions, and crumbs. Call at the START of a session/task so you don't lose context or repeat past mistakes.",
+      inputSchema: {
+        type: "object",
+        properties: { project: { type: "string", description: "project root path" }, limit: { type: "number" } },
+        required: ["project"],
+      },
+      handler: async ({ project, limit }) => memoryStore(project).recall({ limit }),
+    },
+    {
+      name: "remember",
+      description:
+        "Log a crumb when something significant happens (a decision, a problem solved, a direction change, a learned constraint, a mistake). Always include WHY.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          project: { type: "string" },
+          what: { type: "string" },
+          why: { type: "string" },
+          rejected: { type: "string", description: "alternatives considered and rejected" },
+          revisitIf: { type: "string", description: "condition under which to reconsider" },
+          refs: { type: "string" },
+          tags: { type: "array", items: { type: "string" } },
+        },
+        required: ["project", "what", "why"],
+      },
+      handler: async ({ project, ...c }) => memoryStore(project).remember(c),
+    },
+    {
+      name: "record_decision",
+      description: "Record a durable decision (title + why, plus rejected alternatives). Survives across sessions.",
+      inputSchema: {
+        type: "object",
+        properties: { project: { type: "string" }, title: { type: "string" }, why: { type: "string" }, rejected: { type: "string" }, refs: { type: "string" } },
+        required: ["project", "title", "why"],
+      },
+      handler: async ({ project, ...c }) => memoryStore(project).recordDecision(c),
+    },
+    {
+      name: "update_state",
+      description:
+        "Overwrite the living project state summary (.agent/state.md). Use after consolidation or when the project's shape changes.",
+      inputSchema: {
+        type: "object",
+        properties: { project: { type: "string" }, content: { type: "string" } },
+        required: ["project", "content"],
+      },
+      handler: async ({ project, content }) => ({ ok: memoryStore(project).setState(content) }),
+    },
+    {
+      name: "consolidate",
+      description:
+        "Memory 'sleep'. Without newState: returns raw crumbs for you to compress. With newState: writes the new state summary and archives the raw journal.",
+      inputSchema: {
+        type: "object",
+        properties: { project: { type: "string" }, newState: { type: "string" } },
+        required: ["project"],
+      },
+      handler: async ({ project, newState }) => memoryStore(project).consolidate({ newState }),
     },
   ];
 }
