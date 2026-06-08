@@ -11,6 +11,8 @@ import { reportVault, infisicalVault } from "./vault.mjs";
 import { infisicalClient } from "./infisical.mjs";
 import { auditLogger } from "./audit.mjs";
 import { knowledgeStore } from "./knowledge.mjs";
+import { memoryStore } from "./memory.mjs";
+import { localContext, docMap } from "./docs.mjs";
 import { requireApproval } from "./biometric.mjs";
 import { createMcpServer } from "./mcp.mjs";
 import { startStdio } from "./jsonrpc.mjs";
@@ -232,6 +234,106 @@ export function buildTools({ vault, audit, approver, client, knowledge }) {
           })),
         };
       },
+    },
+    {
+      name: "recall",
+      description:
+        "Recall this project's memory — living state, recent decisions, and crumbs. Call at the START of a session/task so you don't lose context or repeat past mistakes.",
+      inputSchema: {
+        type: "object",
+        properties: { project: { type: "string", description: "project root path" }, limit: { type: "number" } },
+        required: ["project"],
+      },
+      handler: async ({ project, limit }) => memoryStore(project).recall({ limit }),
+    },
+    {
+      name: "remember",
+      description:
+        "Log a crumb when something significant happens (a decision, a problem solved, a direction change, a learned constraint, a mistake). Always include WHY. Set higher salience for surprises/mistakes/key decisions; pass supersedes=<id> when this replaces an earlier crumb.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          project: { type: "string" },
+          what: { type: "string" },
+          why: { type: "string" },
+          rejected: { type: "string", description: "alternatives considered and rejected" },
+          revisitIf: { type: "string", description: "condition under which to reconsider" },
+          refs: { type: "string" },
+          tags: { type: "array", items: { type: "string" } },
+          salience: { type: "number", description: "1=routine, 3=normal, 5=surprising/critical (default 3)" },
+          supersedes: { type: "string", description: "id of an earlier crumb this one replaces (reconsolidation)" },
+        },
+        required: ["project", "what", "why"],
+      },
+      handler: async ({ project, ...c }) => memoryStore(project).remember(c),
+    },
+    {
+      name: "record_decision",
+      description:
+        "Record a durable decision (title + why, plus rejected alternatives). Survives across sessions. Pass supersedes=<id> when this decision replaces an earlier one (reconsolidation).",
+      inputSchema: {
+        type: "object",
+        properties: {
+          project: { type: "string" },
+          title: { type: "string" },
+          why: { type: "string" },
+          rejected: { type: "string" },
+          refs: { type: "string" },
+          supersedes: { type: "string", description: "id of an earlier decision this one replaces" },
+        },
+        required: ["project", "title", "why"],
+      },
+      handler: async ({ project, ...c }) => memoryStore(project).recordDecision(c),
+    },
+    {
+      name: "update_state",
+      description:
+        "Overwrite the living project state summary (.agent/state.md). Use after consolidation or when the project's shape changes.",
+      inputSchema: {
+        type: "object",
+        properties: { project: { type: "string" }, content: { type: "string" } },
+        required: ["project", "content"],
+      },
+      handler: async ({ project, content }) => ({ ok: memoryStore(project).setState(content) }),
+    },
+    {
+      name: "consolidate",
+      description:
+        "Memory 'sleep'. Without newState: returns raw crumbs for you to compress. With newState: writes the new state summary and archives the raw journal.",
+      inputSchema: {
+        type: "object",
+        properties: { project: { type: "string" }, newState: { type: "string" } },
+        required: ["project"],
+      },
+      handler: async ({ project, newState }) => memoryStore(project).consolidate({ newState }),
+    },
+    {
+      name: "search_memory",
+      description:
+        "Search this project's memory (crumbs + decisions, INCLUDING archived/consolidated history) by keywords. Use on large/long projects to find WHY something was done.",
+      inputSchema: {
+        type: "object",
+        properties: { project: { type: "string" }, query: { type: "string" }, limit: { type: "number" } },
+        required: ["project", "query"],
+      },
+      handler: async ({ project, query, limit }) => memoryStore(project).search(query, { limit }),
+    },
+    {
+      name: "local_context",
+      description:
+        "Load fractal docs for a path — the nearest CLAUDE.md/AGENTS.md from repo root down to the file's folder (global → local). Call before editing a file so you read the right LOCAL context, not a global blob.",
+      inputSchema: {
+        type: "object",
+        properties: { path: { type: "string" }, project: { type: "string" } },
+        required: ["path", "project"],
+      },
+      handler: async ({ path: p, project }) => localContext(p, project),
+    },
+    {
+      name: "doc_map",
+      description: "Map which folders have fractal docs vs not (coverage + gaps), so you can fill the missing ones.",
+      inputSchema: { type: "object", properties: { project: { type: "string" } }, required: ["project"] },
+      handler: async ({ project }) => docMap(project),
     },
   ];
 }
