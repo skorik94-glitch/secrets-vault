@@ -102,3 +102,40 @@ test("memory: salience ordering, supersede (reconsolidation), consolidate split"
     await fs.rm(proj, { recursive: true, force: true });
   }
 });
+
+test("memory: standing artifacts (constitution) — recall surfaces them first, supersede, search", async () => {
+  const proj = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), "si-mem-")));
+  try {
+    const m = memoryStore(proj);
+    m.recordStanding({ kind: "identity", title: "ICP", body: "solo vibe-coders on Claude/Codex" });
+    m.recordStanding({ kind: "constraint", title: "no silent API changes", body: "never change public contracts without flagging" });
+    m.recordStanding({ kind: "taste", subtype: "dont", title: "no generated-looking UI" });
+    m.recordStanding({ kind: "world-model", subtype: "invariant", title: "zero runtime deps", body: "Node stdlib only" });
+    const old = m.recordStanding({ kind: "learning", title: "use node http server", body: "python CLT broke" });
+
+    const r = m.recall();
+    assert.equal(r.hasMemory, true);
+    assert.equal(r.identity.length, 1);
+    assert.equal(r.identity[0].title, "ICP");
+    assert.equal(r.constitution.constraints.length, 1);
+    assert.equal(r.constitution.taste[0].subtype, "dont");
+    assert.equal(r.constitution.worldModel[0].title, "zero runtime deps");
+    assert.equal(r.constitution.learnings.length, 1);
+
+    // reconsolidation: supersede a standing lens
+    m.recordStanding({ kind: "learning", title: "use bun", body: "faster", supersedes: old.id, supersedeReason: "switched runtimes" });
+    const r2 = m.recall();
+    assert.equal(r2.constitution.learnings.length, 1); // old dropped, new active
+    assert.equal(r2.constitution.learnings[0].title, "use bun");
+    assert.equal(r2.constitution.learnings.some((e) => e.id === old.id), false);
+
+    // search includes standing (the superseded one stays findable in history)
+    assert.ok(m.search("http server").standing.length >= 1);
+    assert.equal(m.search("ICP").standing[0].kind, "identity");
+
+    // unknown kind clamps to a valid bucket (no silent loss)
+    assert.equal(m.recordStanding({ kind: "bogus", title: "x", body: "y" }).kind, "learning");
+  } finally {
+    await fs.rm(proj, { recursive: true, force: true });
+  }
+});

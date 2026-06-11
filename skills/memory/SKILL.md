@@ -6,14 +6,16 @@ description: Use on any non-trivial coding task or long-running project. Gives t
 # Project memory — never lose the thread
 
 This plugin gives the agent a real memory layer per project (`.agent/` in the repo):
-a **living state** summary, a **decision log**, and a **journal of crumbs**. Use it so
+a **constitution** of standing lenses (identity · do-not · taste · invariants), a
+**living state** summary, a **decision log**, and a **journal of crumbs**. Use it so
 work compounds across sessions instead of restarting from zero each time.
 
 `project` for every tool below is the project root path (the repo you're working in).
 
 ## At the start of a session or task — RECALL
-Call `recall(project)` **first**. It returns the living state, recent decisions, and
-crumbs. Read them before doing anything — this is how you regain the context that
+Call `recall(project)` **first**. It returns the project's **identity/constitution**
+(standing lenses) first, then the living state, recent decisions, and crumbs. Read them
+before doing anything — this is how you regain the context that
 Claude/Codex otherwise lose between sessions. If `hasMemory` is false, this is a fresh
 project; you'll be building the memory as you go.
 
@@ -43,6 +45,22 @@ outdated, log the corrected one with `supersedes=<old id>` (ids are in `recall`/
 history/search — so memory stays *correct* without hoarding contradictions.
 
 For durable architectural choices, also call `record_decision(project, title, why, …)`.
+
+## The constitution — STANDING artifacts (durable lenses, surfaced first)
+Crumbs and decisions are *events*. Some knowledge is a **standing lens** the agent should
+apply on every task — it lives longer than any one task, so it gets its own home and
+`recall` renders it **before** state/decisions/crumbs. Call
+`record_standing(project, kind, title, body, …)` when you learn one:
+- **identity** — who this is for, the telos, what we deliberately do NOT build.
+- **world-model** — an invariant, contract, boundary, or source-of-truth (use `subtype`).
+- **constraint** — a do-not / guardrail (e.g. "never change the public API silently").
+- **taste** — a product/UI principle or an anti-reference (`subtype: do|dont|anti-ref`).
+- **learning** — a rule/checklist/principle promoted from a repeated event (a repeated
+  mistake is a hole in memory — promote it so it isn't repeated).
+Prefer a standing artifact (not a crumb) whenever something should shape *how the agent
+works*, not just record *what happened*. Point `refs` at verifiable ground truth (a
+path/symbol/test) so the lens can be re-checked, not just trusted. Revise with
+`supersedes=<id>` + `supersedeReason`; the old version stays in history.
 
 ## Keep the living state current
 `update_state(project, content)` holds the short "where things stand" summary an agent

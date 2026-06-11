@@ -286,6 +286,26 @@ export function buildTools({ vault, audit, approver, client, knowledge }) {
       handler: async ({ project, ...c }) => memoryStore(project).recordDecision(c),
     },
     {
+      name: "record_standing",
+      description:
+        "Record a STANDING artifact — a durable lens the agent should ALWAYS apply (not an event). kind: identity (who/for-whom/telos/non-goals), world-model (an invariant/contract/boundary/source-of-truth), constraint (a do-not / guardrail), taste (a product/UI principle or anti-reference), learning (a promoted rule/checklist/principle). recall surfaces these FIRST, above crumbs. Pass supersedes=<id> (+supersedeReason) to revise one.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          project: { type: "string" },
+          kind: { type: "string", enum: ["identity", "world-model", "constraint", "taste", "learning"] },
+          title: { type: "string", description: "short label, e.g. 'ICP', 'no silent API changes', 'minimalism over density'" },
+          body: { type: "string", description: "the lens itself — the rule/fact/principle, with its why" },
+          subtype: { type: "string", description: "world-model: invariant|contract|boundary|flow|source-of-truth; taste: do|dont|anti-ref; learning: rule|checklist|principle" },
+          refs: { type: "string", description: "pointer to verifiable ground truth (path/symbol/test)" },
+          supersedes: { type: "string", description: "id of an earlier standing artifact this replaces" },
+          supersedeReason: { type: "string", description: "why the prior version was wrong/outdated (kept in history)" },
+        },
+        required: ["project", "kind", "title", "body"],
+      },
+      handler: async ({ project, ...c }) => memoryStore(project).recordStanding(c),
+    },
+    {
       name: "update_state",
       description:
         "Overwrite the living project state summary (.agent/state.md). Use after consolidation or when the project's shape changes.",

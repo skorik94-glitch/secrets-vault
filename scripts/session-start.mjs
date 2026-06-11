@@ -22,6 +22,33 @@ async function readStdin() {
 
 function briefing(r) {
   const L = [];
+  // The constitution comes FIRST — who we are + the rules + the map, before status/events.
+  if (r.identity?.length) {
+    L.push("## Identity / telos — optimize for THIS, not the local task");
+    for (const e of r.identity) L.push(`- ${e.title}${e.body ? ` — ${e.body}` : ""}`);
+    L.push("");
+  }
+  const C = r.constitution || {};
+  if (C.constraints?.length) {
+    L.push("## Constraints — do NOT");
+    for (const e of C.constraints) L.push(`- ${e.title}${e.body ? ` — ${e.body}` : ""}`);
+    L.push("");
+  }
+  if (C.taste?.length) {
+    L.push("## Taste");
+    for (const e of C.taste) L.push(`- ${e.subtype ? `[${e.subtype}] ` : ""}${e.title}${e.body ? ` — ${e.body}` : ""}`);
+    L.push("");
+  }
+  if (C.worldModel?.length) {
+    L.push("## World-model — invariants / contracts / boundaries");
+    for (const e of C.worldModel) L.push(`- ${e.subtype ? `[${e.subtype}] ` : ""}${e.title}${e.body ? ` — ${e.body}` : ""}`);
+    L.push("");
+  }
+  if (C.learnings?.length) {
+    L.push("## Learned rules (don't relearn these the hard way)");
+    for (const e of C.learnings) L.push(`- ${e.title}${e.body ? ` — ${e.body}` : ""}`);
+    L.push("");
+  }
   if (r.state && r.state.trim()) L.push(r.state.trim(), "");
   if (r.decisions?.length) {
     L.push("## Decisions on record");

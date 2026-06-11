@@ -24,6 +24,12 @@ const clampSalience = (s) => {
   return Math.max(1, Math.min(5, Math.round(n)));
 };
 
+// Standing artifacts ("constitution"): durable LENSES the agent should always apply,
+// not events. Kinds map to the external-cortex layers: identity/telos (L1),
+// world-model (L2), constraint/do-not (L8), taste (L10), learning (L11).
+const STANDING_KINDS = new Set(["identity", "world-model", "constraint", "taste", "learning"]);
+const clampKind = (k) => (STANDING_KINDS.has(k) ? k : "learning");
+
 export function memoryStore(project, clock = () => new Date().toISOString()) {
   const base = path.join(project, ".agent");
   const P = {
@@ -31,6 +37,7 @@ export function memoryStore(project, clock = () => new Date().toISOString()) {
     state: path.join(base, "state.md"),
     journal: path.join(base, "journal.jsonl"),
     decisions: path.join(base, "decisions.jsonl"),
+    standing: path.join(base, "standing.jsonl"),
     archive: path.join(base, "archive"),
   };
   const ensure = () => fs.mkdirSync(base, { recursive: true });
@@ -101,6 +108,27 @@ export function memoryStore(project, clock = () => new Date().toISOString()) {
     return entry;
   };
 
+  // A STANDING artifact: a durable lens (identity/telos, a world-model fact, a
+  // constraint/do-not, a taste rule, a learned rule). Surfaced FIRST by recall —
+  // it's "how to think about this project", not an event. supersedes lets it be
+  // revised while keeping the prior version (with its reason) in history.
+  const recordStanding = (c = {}) => {
+    ensure();
+    const entry = clean({
+      id: randomUUID().slice(0, 8),
+      ts: clock(),
+      kind: clampKind(c.kind),
+      subtype: c.subtype, // world-model: invariant|contract|boundary…; taste: do|dont|anti-ref
+      title: c.title,
+      body: c.body,
+      refs: c.refs, // pointer to verifiable ground truth (code/test) — epistemics
+      supersedes: c.supersedes,
+      supersedeReason: c.supersedeReason,
+    });
+    fs.appendFileSync(P.standing, JSON.stringify(entry) + "\n");
+    return entry;
+  };
+
   // Reconsolidation: drop any entry that a later entry has superseded — keep current truth.
   const active = (entries) => {
     const sup = new Set(entries.flatMap((e) => (e.supersedes ? [e.supersedes] : [])));
@@ -108,19 +136,29 @@ export function memoryStore(project, clock = () => new Date().toISOString()) {
   };
   const journal = (limit = 50) => active(readJsonl(P.journal)).slice(-limit);
   const decisionLog = (limit = 100) => active(readJsonl(P.decisions)).slice(-limit);
+  const standing = () => active(readJsonl(P.standing));
+  const groupStanding = () => {
+    const live = standing();
+    const by = (k) => live.filter((e) => e.kind === k);
+    return { identity: by("identity"), worldModel: by("world-model"), constraints: by("constraint"), taste: by("taste"), learnings: by("learning") };
+  };
 
-  // Retrieval: surface the MOST SALIENT crumbs first (surprises / key decisions /
-  // mistakes), then recency — not just the latest noise.
+  // Retrieval: identity/telos FIRST, then the standing lenses (world-model, do-not,
+  // taste, learnings) ABOVE the event stream — so the agent gets "who we are + the
+  // rules + the map" before "what happened". Crumbs: most salient first, then recency.
   const recall = ({ limit = 20 } = {}) => {
     const crumbs = active(readJsonl(P.journal))
       .sort((a, b) => (b.salience || 3) - (a.salience || 3) || String(b.ts).localeCompare(String(a.ts)))
       .slice(0, limit);
+    const s = groupStanding();
     return {
       project,
+      identity: s.identity, // rendered first — telos / who this is for / non-goals
+      constitution: { worldModel: s.worldModel, constraints: s.constraints, taste: s.taste, learnings: s.learnings },
       state: getState(),
       decisions: decisionLog(50),
       crumbs,
-      hasMemory: fs.existsSync(P.state) || fs.existsSync(P.journal),
+      hasMemory: fs.existsSync(P.state) || fs.existsSync(P.journal) || fs.existsSync(P.standing),
     };
   };
 
@@ -153,7 +191,7 @@ export function memoryStore(project, clock = () => new Date().toISOString()) {
   // history — so the "why" from months ago is still findable on a long project.
   const search = (query, { limit = 20 } = {}) => {
     const terms = String(query || "").toLowerCase().split(/\s+/).filter(Boolean);
-    if (!terms.length) return { query, crumbs: [], decisions: [], stateMatch: false };
+    if (!terms.length) return { query, crumbs: [], decisions: [], standing: [], stateMatch: false };
     const score = (v) => {
       const t = String(Array.isArray(v) ? v.join(" ") : (v ?? "")).toLowerCase();
       return terms.reduce((s, w) => s + (t.includes(w) ? 1 : 0), 0);
@@ -175,9 +213,10 @@ export function memoryStore(project, clock = () => new Date().toISOString()) {
       query,
       crumbs: rank([...archived, ...readJsonl(P.journal)], ["what", "why", "rejected", "revisitIf", "refs", "tags"]),
       decisions: rank(readJsonl(P.decisions), ["title", "why", "rejected", "refs"]),
+      standing: rank(readJsonl(P.standing), ["title", "body", "kind", "subtype", "refs"]),
       stateMatch: score(getState()) > 0,
     };
   };
 
-  return { getState, setState, remember, recordDecision, journal, decisionLog, recall, search, consolidate, paths: P };
+  return { getState, setState, remember, recordDecision, recordStanding, journal, decisionLog, standing, groupStanding, recall, search, consolidate, paths: P };
 }
